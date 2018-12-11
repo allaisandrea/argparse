@@ -62,7 +62,7 @@ template <> unsigned long long strto<unsigned long long>(const char *str, char *
 }
 
 template <> int strto<int>(const char *str, char **strend) {
-    const long x = std::strtoull(str, strend, 0);
+    const long long x = std::strtoll(str, strend, 0);
     if (x > INT_MAX || x < INT_MIN) {
         errno = ERANGE;
     }
