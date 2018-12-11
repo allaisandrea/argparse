@@ -2,11 +2,14 @@
 #include <cstdint>
 #include <gtest/gtest.h>
 
-template <typename T> struct ArgparseAllTypes : public ::testing::Test {};
+template <typename T>
+struct ArgparseAllTypes : public ::testing::Test {};
 
-template <typename T> struct ArgparseAllArithmeticTypes : public ::testing::Test {};
+template <typename T>
+struct ArgparseAllArithmeticTypes : public ::testing::Test {};
 
-template <typename T> struct ArgparseSignedIntegers : public ::testing::Test {};
+template <typename T>
+struct ArgparseSignedIntegers : public ::testing::Test {};
 
 using AllTypes = ::testing::Types<uint64_t, uint32_t, int64_t, int32_t, double, float, std::string>;
 using AllArithmeticTypes = ::testing::Types<uint64_t, uint32_t, int64_t, int32_t, double, float>;
@@ -16,17 +19,21 @@ TYPED_TEST_CASE(ArgparseAllTypes, AllTypes);
 TYPED_TEST_CASE(ArgparseAllArithmeticTypes, AllArithmeticTypes);
 TYPED_TEST_CASE(ArgparseSignedIntegers, SignedIntegers);
 
-template <typename T> std::vector<std::pair<std::string, T>> GetValidTokens();
+template <typename T>
+std::vector<std::pair<std::string, T>> GetValidTokens();
 
-template <> std::vector<std::pair<std::string, uint64_t>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, uint64_t>> GetValidTokens() {
     return {{"123", 123}, {"45", 45}, {"0x12", 0x12}, {"0xFFFFFFFFFFFFFFFF", 0xFFFFFFFFFFFFFFFF}};
 }
 
-template <> std::vector<std::pair<std::string, uint32_t>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, uint32_t>> GetValidTokens() {
     return {{"123", 123}, {"45", 45}, {"0x12", 0x12}, {"0xFFFFFFFF", 0xFFFFFFFF}};
 }
 
-template <> std::vector<std::pair<std::string, int64_t>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, int64_t>> GetValidTokens() {
     return {{"123", 123},
             {"45", 45},
             {"0x12", 0x12},
@@ -36,7 +43,8 @@ template <> std::vector<std::pair<std::string, int64_t>> GetValidTokens() {
             {"-0x8000000000000000", -0x8000000000000000}};
 }
 
-template <> std::vector<std::pair<std::string, int32_t>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, int32_t>> GetValidTokens() {
     return {{"123", 123},
             {"45", 45},
             {"0x12", 0x12},
@@ -46,40 +54,69 @@ template <> std::vector<std::pair<std::string, int32_t>> GetValidTokens() {
             {"-0x80000000", -0x80000000}};
 }
 
-template <> std::vector<std::pair<std::string, double>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, double>> GetValidTokens() {
     return {{"1.23", 1.23}, {"4.0e5", 4.0e5}, {"1.0e308", 1.0e308}};
 }
 
-template <> std::vector<std::pair<std::string, float>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, float>> GetValidTokens() {
     return {{"1.23", 1.23f}, {"4.0e5", 4.0e5f}, {"1.0e38", 1.0e38f}};
 }
 
-template <> std::vector<std::pair<std::string, std::string>> GetValidTokens() {
+template <>
+std::vector<std::pair<std::string, std::string>> GetValidTokens() {
     return {{"foo", "foo"}, {"bar", "bar"}};
 }
 
-template <typename T> std::string GetOverflowToken();
+template <typename T>
+std::string GetOverflowToken();
 
-template <> std::string GetOverflowToken<uint64_t>() { return "0x10000000000000000"; }
+template <>
+std::string GetOverflowToken<uint64_t>() {
+    return "0x10000000000000000";
+}
 
-template <> std::string GetOverflowToken<uint32_t>() { return "0x100000000"; }
+template <>
+std::string GetOverflowToken<uint32_t>() {
+    return "0x100000000";
+}
 
-template <> std::string GetOverflowToken<int64_t>() { return "0x8000000000000000"; }
+template <>
+std::string GetOverflowToken<int64_t>() {
+    return "0x8000000000000000";
+}
 
-template <> std::string GetOverflowToken<int32_t>() { return "0x80000000"; }
+template <>
+std::string GetOverflowToken<int32_t>() {
+    return "0x80000000";
+}
 
-template <> std::string GetOverflowToken<double>() { return "1.0e309"; }
+template <>
+std::string GetOverflowToken<double>() {
+    return "1.0e309";
+}
 
-template <> std::string GetOverflowToken<float>() { return "1.0e39"; }
+template <>
+std::string GetOverflowToken<float>() {
+    return "1.0e39";
+}
 
-template <typename T> std::string GetUnderflowToken();
+template <typename T>
+std::string GetUnderflowToken();
 
-template <> std::string GetUnderflowToken<int64_t>() { return "-0x8000000000000001"; }
+template <>
+std::string GetUnderflowToken<int64_t>() {
+    return "-0x8000000000000001";
+}
 
-template <> std::string GetUnderflowToken<int32_t>() { return "-0x80000001"; }
+template <>
+std::string GetUnderflowToken<int32_t>() {
+    return "-0x80000001";
+}
 
 TYPED_TEST(ArgparseAllTypes, HandlesValidTokens) {
-    for (const auto &pair : GetValidTokens<TypeParam>()) {
+    for (const auto& pair : GetValidTokens<TypeParam>()) {
         TypeParam x;
         EXPECT_TRUE(argparse::ParseToken(pair.first, &x).empty()) << pair.first;
         EXPECT_EQ(pair.second, x);
@@ -104,16 +141,19 @@ TYPED_TEST(ArgparseSignedIntegers, HandlesUnderflow) {
     EXPECT_FALSE(argparse::ParseToken(GetUnderflowToken<TypeParam>(), &x).empty());
 }
 
-// void f();
-//
-// void f() {
-//     struct Args {
-//         int x;
-//         std::vector<int> y;
-//     };
-//
-//     char **argv = nullptr;
-//     int argc = 0;
-//     Args args;
-//     Parse({Option("foo", &args.x), Option("bar", &args.y)}, argc, argv);
-// }
+TEST(Argparse, Argparse) {
+    struct Arguments {
+        int intField;
+        std::string stringField;
+    };
+
+    const std::vector<const char*> tokens = {"program", "--foo", "1"};
+
+    Arguments arguments;
+    std::string errorMessage = argparse::Parse(
+            {argparse::Option("foo", "description", &Arguments::intField),
+             argparse::Positional("description", &Arguments::stringField)},
+            tokens.size(),
+            tokens.data(),
+            &arguments);
+}
