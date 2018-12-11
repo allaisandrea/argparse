@@ -2,8 +2,6 @@
 #include <cstdint>
 #include <gtest/gtest.h>
 
-using namespace argparse;
-
 template <typename T> struct ArgparseAllTypes : public ::testing::Test {};
 
 template <typename T> struct ArgparseAllArithmeticTypes : public ::testing::Test {};
@@ -83,7 +81,7 @@ template <> std::string GetUnderflowToken<int32_t>() { return "-0x80000001"; }
 TYPED_TEST(ArgparseAllTypes, HandlesValidTokens) {
     for (const auto &pair : GetValidTokens<TypeParam>()) {
         TypeParam x;
-        EXPECT_TRUE(internal::ParseToken(pair.first, &x).empty()) << pair.first;
+        EXPECT_TRUE(argparse::ParseToken(pair.first, &x).empty()) << pair.first;
         EXPECT_EQ(pair.second, x);
     }
 }
@@ -92,18 +90,18 @@ TYPED_TEST(ArgparseAllArithmeticTypes, HandlesGarbage) {
     TypeParam x;
     const std::vector<std::string> garbageTokens = {"a12", "45a", "45 "};
     for (const std::string& token : garbageTokens) {
-        EXPECT_FALSE(internal::ParseToken(token, &x).empty());
+        EXPECT_FALSE(argparse::ParseToken(token, &x).empty());
     }
 }
 
 TYPED_TEST(ArgparseAllArithmeticTypes, HandlesOverflow) {
     TypeParam x;
-    EXPECT_FALSE(internal::ParseToken(GetOverflowToken<TypeParam>(), &x).empty());
+    EXPECT_FALSE(argparse::ParseToken(GetOverflowToken<TypeParam>(), &x).empty());
 }
 
 TYPED_TEST(ArgparseSignedIntegers, HandlesUnderflow) {
     TypeParam x;
-    EXPECT_FALSE(internal::ParseToken(GetUnderflowToken<TypeParam>(), &x).empty());
+    EXPECT_FALSE(argparse::ParseToken(GetUnderflowToken<TypeParam>(), &x).empty());
 }
 
 // void f();

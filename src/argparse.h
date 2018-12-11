@@ -7,8 +7,6 @@
 
 namespace argparse {
 
-namespace internal {
-
 template <typename T> const char *GetTypeName();
 
 template <> const char *GetTypeName<unsigned long long>() { return "unsigned long long"; }
@@ -126,17 +124,19 @@ inline std::string ParseToken(const std::string &token, std::string *x) {
 //     T *const _field;
 // };
 
-} // namespace internal
-
 // template <typename T>
 // std::shared_ptr<internal::TypedOption<T>> Option(const std::string &name,
 //                                                  T *const field) {
 //     return std::make_shared<internal::TypedOption<T>>(name, field);
 // }
 //
-// inline bool
-// Parse(const std::vector<std::shared_ptr<internal::OptionBase>> &options,
-//       int argc, char const *const *const argv) {
-//     return true;
+
+// template <typename Arguments>
+// inline std::pair<std::shared_ptr<Arguments>, std::string>
+// Parse(
+//     const std::vector<std::shared_ptr<internal::GenericPositional<Arguments>>> &positionals
+//     const std::vector<std::shared_ptr<internal::GenericOption<Arguments>>> &options,
+//     int argc, char const *const *const argv) {
+//     return {std::make_shared<Arguments>(), ""};
 // }
 } // namespace argparse
