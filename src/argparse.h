@@ -139,40 +139,67 @@ inline std::string ParseToken(const std::string& token, std::string* x) {
 
 template <typename Arguments>
 class GenericArgument {
-  public:
+public:
     virtual std::string
     parse(const std::vector<std::string>& tokens,
-          std::vector<std::string>* tokenHasBeenParsedBy) = 0;
+          std::vector<std::string>* tokenHasBeenParsedBy) const = 0;
+    virtual bool isPositional() const = 0;
     virtual ~GenericArgument() = default;
 };
 
 template <typename Arguments, typename T>
 class TypedOption : public GenericArgument<Arguments> {
-  public:
-    TypedOption(const std::string& name, const std::string& description, T Arguments::*offset) {}
+public:
+    TypedOption(const std::string& name, const std::string& description, T Arguments::*offset)
+            : _name(name), _description(description), _offset(offset), _defaultValue(),
+              _hasDefaultValue(false) {}
     TypedOption(
             const std::string& name,
             const std::string& description,
             T Arguments::*offset,
-            const T& defaultValue) {}
+            const T& defaultValue)
+            : _name(name), _description(description), _offset(offset), _defaultValue(defaultValue),
+              _hasDefaultValue(true) {}
+
+    bool isPositional() const override { return false; }
     std::string
-    parse(const std::vector<std::string>& tokens, std::vector<std::string>* tokenHasBeenParsedBy) {
+    parse(const std::vector<std::string>& tokens,
+          std::vector<std::string>* tokenHasBeenParsedBy) const override {
         return "";
     }
+
+private:
+    std::string const _name;
+    std::string const _description;
+    T Arguments::*const _offset;
+    T const _defaultValue;
+    bool const _hasDefaultValue;
 };
 
 template <typename Arguments, typename T>
 class TypedPositionalArgument : public GenericArgument<Arguments> {
-  public:
-    TypedPositionalArgument(const std::string& description, T Arguments::*offset) {}
+public:
+    TypedPositionalArgument(const std::string& description, T Arguments::*offset)
+            : _description(description), _offset(offset), _defaultValue(), _hasDefaultValue(false) {
+    }
     TypedPositionalArgument(
             const std::string& description,
             T Arguments::*offset,
-            const T& defaultValue) {}
+            const T& defaultValue)
+            : _description(description), _offset(offset), _defaultValue(defaultValue),
+              _hasDefaultValue(true) {}
+    bool isPositional() const override { return true; }
     std::string
-    parse(const std::vector<std::string>& tokens, std::vector<std::string>* tokenHasBeenParsedBy) {
+    parse(const std::vector<std::string>& tokens,
+          std::vector<std::string>* tokenHasBeenParsedBy) const override {
         return "";
     }
+
+private:
+    std::string const _description;
+    T Arguments::*const _offset;
+    T const _defaultValue;
+    bool const _hasDefaultValue;
 };
 
 template <typename Arguments, typename T>
